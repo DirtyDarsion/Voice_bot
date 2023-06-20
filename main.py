@@ -25,6 +25,18 @@ async def start(message):
     await message.answer('Напиши вася')
 
 
+@dp.message_handler(Text(startswith='вася текст', ignore_case=True))
+async def get_text_from_voice(message):
+    try:
+        file_id = message.reply_to_message.voice.file_id
+        file = await bot.get_file(file_id)
+        file_path = file.file_path
+        await bot.download_file(file_path, 'voices/temp.ogg')
+        await message.answer('OK')
+    except TypeError and AttributeError:
+        await message.answer('Перешли мне голосовое сообщение')
+
+
 @dp.message_handler(Text(startswith='вася', ignore_case=True))
 async def choose_dir(message):
     await message.delete()
