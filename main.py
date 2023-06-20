@@ -8,6 +8,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.callback_data import CallbackData
 
 from voice_to_text import voice_to_text
+from download_video import download_video
 
 load_dotenv()
 
@@ -25,6 +26,27 @@ db = {}
 @dp.message_handler(Command('start'))
 async def start(message):
     await message.answer('Напиши вася')
+
+
+@dp.message_handler(Text(startswith='вася видео', ignore_case=True))
+async def get_video(message):
+    data = message.text.split()
+    if len(data) != 3:
+        await message.answer('Неверный формат!\nДля загрузки видео введите "Вася видео <ссылка на видео>"')
+        return
+
+    temp_message = await message.answer('Работаю')
+
+    url = data[2]
+    ans = download_video(url)
+
+    if ans['success']:
+        await message.delete()
+        await temp_message.edit_text(message.from_user.first_name)
+        await bot.send_video(message.chat.id, open(ans['file'], 'rb'))
+        os.remove(ans['file'])
+    else:
+        await temp_message.edit_text(ans['reason'])
 
 
 @dp.message_handler(Text(startswith='вася текст', ignore_case=True))
