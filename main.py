@@ -7,6 +7,8 @@ from aiogram.dispatcher.filters import Command, Text
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.callback_data import CallbackData
 
+from voice_to_text import voice_to_text
+
 load_dotenv()
 
 TOKEN = os.getenv('TOKEN')
@@ -31,10 +33,15 @@ async def get_text_from_voice(message):
         file_id = message.reply_to_message.voice.file_id
         file = await bot.get_file(file_id)
         file_path = file.file_path
-        await bot.download_file(file_path, 'voices/temp.ogg')
-        await message.answer('OK')
+        local_path = 'voices/temp.mp3'
+        await bot.download_file(file_path, local_path)
+
+        temp_message = await message.reply('Работаю')
+        text = voice_to_text(local_path)
+
+        await temp_message.edit_text(text)
     except TypeError and AttributeError:
-        await message.answer('Перешли мне голосовое сообщение')
+        await message.answer('Произошла ошибка.')
 
 
 @dp.message_handler(Text(startswith='вася', ignore_case=True))
