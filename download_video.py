@@ -25,7 +25,7 @@ def download_youtube_video(url):
 
 
 def download_tiktok_video(url):
-    did = TikTokApi.generate_device_id()
+    did = str(random.randint(10000, 999999999))
     print(did)
     with TikTokApi(custom_verify_fp=TIKTOK_VERIFY, use_test_endpoints=True, custom_device_id=did) as api:
         video = api.video(url=url)
