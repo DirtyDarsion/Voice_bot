@@ -39,21 +39,24 @@ def download_youtube_video(url):
 def download_tiktok_video(url):
     add_log('download_tiktok_video', log_level=1, info=f'start, URL: {url}')
     did = str(random.randint(10000, 999999999))
-    with TikTokApi(custom_verify_fp=TIKTOK_VERIFY, use_test_endpoints=True, custom_device_id=did) as api:
-        add_log('download_tiktok_video', log_level=1, info=f'load TikTokApi')
-        video = api.video(url=url)
-        add_log('download_tiktok_video', log_level=1, info=f'get video')
-        video_data = video.bytes()
-        add_log('download_tiktok_video', log_level=1, info=f'format video')
-        with open(FILENAME, "wb") as out_file:
-            add_log('download_tiktok_video', log_level=1, info=f'download video')
-            out_file.write(video_data)
-            add_log('download_tiktok_video', log_level=1, info=f'success')
+    api = TikTokApi(custom_verify_fp=TIKTOK_VERIFY, use_test_endpoints=True, custom_device_id=did)
+    add_log('download_tiktok_video', log_level=1, info=f'load TikTokApi')
 
-        return {
-            'success': True,
-            'file': FILENAME,
-        }
+    video = api.video(url=url)
+    add_log('download_tiktok_video', log_level=1, info=f'get video')
+
+    video_data = video.bytes()
+    add_log('download_tiktok_video', log_level=1, info=f'format video')
+
+    with open(FILENAME, "wb") as out_file:
+        add_log('download_tiktok_video', log_level=1, info=f'download video')
+        out_file.write(video_data)
+        add_log('download_tiktok_video', log_level=1, info=f'success')
+
+    return {
+        'success': True,
+        'file': FILENAME,
+    }
 
 
 def download_video(url):
