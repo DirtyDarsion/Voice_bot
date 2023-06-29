@@ -25,19 +25,20 @@ def download_youtube_video(url):
 
 
 def download_tiktok_video(url):
-    api = TikTokApi(custom_verify_fp=TIKTOK_VERIFY, use_test_endpoints=True)
+    did = TikTokApi.generate_device_id()
+    print(did)
+    with TikTokApi(custom_verify_fp=TIKTOK_VERIFY, use_test_endpoints=True, custom_device_id=did) as api
+        video = api.video(url=url)
+        print(video.id)
 
-    video = api.video(url=url)
-    print(video.id)
+        video_data = video.bytes()
+        with open(FILENAME, "wb") as out_file:
+            out_file.write(video_data)
 
-    video_data = video.bytes()
-    with open(FILENAME, "wb") as out_file:
-        out_file.write(video_data)
-
-    return {
-        'success': True,
-        'file': FILENAME,
-    }
+        return {
+            'success': True,
+            'file': FILENAME,
+        }
 
 
 def download_video(url):
