@@ -1,6 +1,5 @@
 import os
 import nest_asyncio
-import logging
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
@@ -8,16 +7,11 @@ from aiogram.dispatcher.filters import Command, Text, IDFilter
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.callback_data import CallbackData
 
+from config import add_log, TOKEN, ADMIN
 from voice_to_text import voice_to_text
 from download_video import download_video
-from vars import TOKEN, ADMIN
 
 nest_asyncio.apply()
-logging.basicConfig(level=logging.INFO,
-                    filename="voice_bot.log",
-                    filemode="a",
-                    format="%(asctime)s %(levelname)s %(message)s")
-
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -28,41 +22,35 @@ voice_set = CallbackData('voi', 'user_id', 'voice')
 db = {}
 
 
-def add_log(message, info=None):
-    user = f'{message.from_user.username}({message.from_user.id})'
-    if message.chat.type == 'group':
-        chat = f' in {message.chat.title}({message.chat.id})'
-    else:
-        chat = ''
-
-    text = f'{user}{chat} {info} ({message.text})'
-    logging.info(text)
-
-
 @dp.message_handler(Command('start'))
 async def start(message):
-    add_log(message, 'send /start.')
+    add_log('start', message)
 
     await message.answer('Напиши вася')
 
 
 @dp.message_handler(Text(startswith='вася видео', ignore_case=True))
 async def get_video(message):
-    add_log(message, 'send message get video')
+    add_log('get_video', message)
 
     data = message.text.split()
     if len(data) != 3:
+        add_log('get_video', message, log_level=1, info='bad format')
         await message.answer('Неверный формат!\nДля загрузки видео введите "Вася видео <ссылка на видео>"')
         return
 
     temp_message = await message.answer('Работаю')
 
     url = data[2]
+
+    add_log('get_video', message, log_level=1, info='load "download_video"')
     ans = download_video(url)
+    add_log('get_video', message, log_level=1, info=f'download_video response: {ans}')
 
     if ans['success']:
         await temp_message.edit_text(message.from_user.first_name)
         await bot.send_video(message.chat.id, open(ans['file'], 'rb'))
+        add_log('get_video', message, log_level=1, info=f'video sent successful')
         os.remove(ans['file'])
     else:
         await temp_message.edit_text(ans['reason'])
@@ -70,7 +58,7 @@ async def get_video(message):
 
 @dp.message_handler(Text(startswith='вася текст', ignore_case=True))
 async def get_text_from_voice(message):
-    add_log(message, 'send message voice to text')
+    add_log('get_text_from_voice', message)
 
     try:
         file_id = message.reply_to_message.voice.file_id
@@ -89,16 +77,16 @@ async def get_text_from_voice(message):
 
 @dp.message_handler(Text(startswith='вася лог', ignore_case=True), IDFilter(ADMIN))
 async def send_log(message):
-    add_log(message, 'send message log')
+    add_log('text_from_voice', message)
     await message.reply_document(open('voice_bot.log', 'rb'))
 
 
 @dp.message_handler(Text(startswith='вася', ignore_case=True))
-async def choose_dir(message):
-    add_log(message, 'send message "Vasya"')
+async def get_voice(message):
+    add_log('get_voice', message)
 
     await message.delete()
-
+    add_log(message, 'get_voice')
     user_id = message.from_user.id
     categories = os.listdir('voices')
 
