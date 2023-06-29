@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
-from aiogram.dispatcher.filters import Command, Text
+from aiogram.types.chat import ChatType
+from aiogram.dispatcher.filters import Command, Text, ChatTypeFilter
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.callback_data import CallbackData
 
@@ -21,6 +22,7 @@ dir_set = CallbackData('dir', 'user_id', 'dir')
 voice_set = CallbackData('voi', 'user_id', 'voice')
 
 db = {}
+replace = {'тест': 'Тест-замена'}
 
 
 @dp.message_handler(Command('start'))
@@ -116,6 +118,14 @@ async def send_voice(call: types.CallbackQuery, callback_data: dict):
 
         await call.message.delete()
         await bot.send_voice(call.message.chat.id, InputFile(path))
+
+
+@dp.message_handler(ChatTypeFilter(ChatType.GROUP))
+async def replace_word(message):
+    for word in replace:
+        if word in message.text:
+            text = message.text.replace(word, replace[word])
+            await message.edit_text(text)
 
 
 async def on_startup(_):
