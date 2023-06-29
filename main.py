@@ -122,6 +122,7 @@ async def send_voice(call: types.CallbackQuery, callback_data: dict):
 
 @dp.message_handler(ChatTypeFilter(ChatType.GROUP))
 async def replace_word(message):
+    print('ok')
     for word in replace:
         if word in message.text:
             text = message.text.replace(word, replace[word])
