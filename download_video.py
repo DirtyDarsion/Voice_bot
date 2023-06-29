@@ -4,7 +4,6 @@ from TikTokApi import TikTokApi
 
 from vars import TIKTOK_VERIFY
 
-
 FILENAME = 'temp.mp4'
 
 
@@ -24,7 +23,7 @@ def download_youtube_video(url):
 
 
 def download_tiktok_video(url):
-    with TikTokApi(custom_verify_fp=TIKTOK_VERIFY) as api:
+    with TikTokApi(custom_verify_fp=TIKTOK_VERIFY, use_test_endpoints=True) as api:
         video = api.video(url=url)
         video_data = video.bytes()
         with open(FILENAME, "wb") as out_file:
@@ -37,7 +36,6 @@ def download_tiktok_video(url):
 
 
 def download_video(url):
-    print(TIKTOK_VERIFY)
     url_parse = urlparse(url)
 
     if url_parse.netloc.endswith('youtube.com'):
