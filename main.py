@@ -4,13 +4,13 @@ import logging
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
-from aiogram.dispatcher.filters import Command, Text
+from aiogram.dispatcher.filters import Command, Text, IDFilter
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.callback_data import CallbackData
 
 from voice_to_text import voice_to_text
 from download_video import download_video
-from vars import TOKEN
+from vars import TOKEN, ADMIN
 
 nest_asyncio.apply()
 logging.basicConfig(level=logging.INFO,
@@ -26,16 +26,30 @@ dir_set = CallbackData('dir', 'user_id', 'dir')
 voice_set = CallbackData('voi', 'user_id', 'voice')
 
 db = {}
-replace = {'тест': 'Тест-замена'}
+
+
+def add_log(message, info=None):
+    user = f'{message.from_user.username}({message.from_user.id})'
+    if message.chat.type == 'group':
+        chat = f' in {message.chat.title}({message.chat.id})'
+    else:
+        chat = ''
+
+    text = f'{user}{chat} {info} ({message.text})'
+    logging.info(text)
 
 
 @dp.message_handler(Command('start'))
 async def start(message):
+    add_log(message, 'send /start.')
+
     await message.answer('Напиши вася')
 
 
 @dp.message_handler(Text(startswith='вася видео', ignore_case=True))
 async def get_video(message):
+    add_log(message, 'send message get video')
+
     data = message.text.split()
     if len(data) != 3:
         await message.answer('Неверный формат!\nДля загрузки видео введите "Вася видео <ссылка на видео>"')
@@ -56,6 +70,8 @@ async def get_video(message):
 
 @dp.message_handler(Text(startswith='вася текст', ignore_case=True))
 async def get_text_from_voice(message):
+    add_log(message, 'send message voice to text')
+
     try:
         file_id = message.reply_to_message.voice.file_id
         file = await bot.get_file(file_id)
@@ -71,8 +87,16 @@ async def get_text_from_voice(message):
         await message.answer('Произошла ошибка.')
 
 
+@dp.message_handler(Text(startswith='вася лог', ignore_case=True), IDFilter(ADMIN))
+async def send_log(message):
+    add_log(message, 'send message log')
+    await message.reply_document(open('voice_bot.log', 'rb'))
+
+
 @dp.message_handler(Text(startswith='вася', ignore_case=True))
 async def choose_dir(message):
+    add_log(message, 'send message "Vasya"')
+
     await message.delete()
 
     user_id = message.from_user.id
@@ -123,13 +147,8 @@ async def send_voice(call: types.CallbackQuery, callback_data: dict):
         await bot.send_voice(call.message.chat.id, InputFile(path))
 
 
-async def on_startup(_):
-    print('Start bot!')
-
-
 if __name__ == '__main__':
     executor.start_polling(
         dispatcher=dp,
-        on_startup=on_startup,
         skip_updates=True,
     )
