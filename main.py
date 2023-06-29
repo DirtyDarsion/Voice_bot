@@ -1,5 +1,6 @@
 import os
 import nest_asyncio
+import logging
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
@@ -12,10 +13,14 @@ from download_video import download_video
 from vars import TOKEN
 
 nest_asyncio.apply()
+logging.basicConfig(level=logging.INFO,
+                    filename="voice_bot.log",
+                    filemode="a",
+                    format="%(asctime)s %(levelname)s %(message)s")
+
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
-
 
 dir_set = CallbackData('dir', 'user_id', 'dir')
 voice_set = CallbackData('voi', 'user_id', 'voice')
