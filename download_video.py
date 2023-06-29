@@ -30,7 +30,7 @@ def download_tiktok_video(url):
         video = api.video(url=url)
         print(video.id)
         with open('info.json', 'w') as f:
-            f.writelines(video.info())
+            f.writelines(str(video.info()))
         video_data = video.bytes()
         with open(FILENAME, "wb") as out_file:
             out_file.write(video_data)
