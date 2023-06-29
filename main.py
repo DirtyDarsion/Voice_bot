@@ -1,4 +1,5 @@
 import os
+import nest_asyncio
 from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher, executor, types
@@ -11,6 +12,7 @@ from voice_to_text import voice_to_text
 from download_video import download_video
 
 load_dotenv()
+nest_asyncio.apply()
 
 TOKEN = os.getenv('TOKEN')
 bot = Bot(token=TOKEN)
