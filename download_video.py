@@ -29,7 +29,8 @@ def download_tiktok_video(url):
     with TikTokApi(custom_verify_fp=TIKTOK_VERIFY, use_test_endpoints=True, custom_device_id=did) as api:
         video = api.video(url=url)
         print(video.id)
-        print(video.info())
+        with open('info.json', 'w') as f:
+            f.writelines(video.info())
         video_data = video.bytes()
         with open(FILENAME, "wb") as out_file:
             out_file.write(video_data)
