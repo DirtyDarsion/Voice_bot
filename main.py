@@ -1,6 +1,5 @@
 import os
 import nest_asyncio
-from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
@@ -10,11 +9,10 @@ from aiogram.utils.callback_data import CallbackData
 
 from voice_to_text import voice_to_text
 from download_video import download_video
+from vars import TOKEN
 
-load_dotenv()
 nest_asyncio.apply()
 
-TOKEN = os.getenv('TOKEN')
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
