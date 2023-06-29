@@ -44,6 +44,7 @@ async def get_video(message):
     if ans['success']:
         await temp_message.edit_text(message.from_user.first_name)
         await bot.send_video(message.chat.id, open(ans['file'], 'rb'))
+        os.remove(ans['file'])
     else:
         await temp_message.edit_text(ans['reason'])
 
