@@ -1,5 +1,6 @@
 from urllib.parse import urlparse
 from pytube import YouTube
+from TikTokApi import TikTokApi
 
 FILENAME = 'temp.mp4'
 
@@ -19,11 +20,25 @@ def download_youtube_video(url):
         }
 
 
+def download_tiktok_video(url):
+    with TikTokApi() as api:
+        video = api.video(url=url)
+        video_data = video.bytes()
+        with open(FILENAME, "wb") as out_file:
+            out_file.write(video_data)
+        return {
+            'success': True,
+            'file': FILENAME,
+        }
+
+
 def download_video(url):
     url_parse = urlparse(url)
 
     if url_parse.netloc.endswith('youtube.com'):
         return download_youtube_video(url)
+    elif url_parse.netloc.endswith('tiktok.com'):
+        return download_tiktok_video(url)
     else:
         return {'success': False,
                 'reason': 'Неизвестный URL'}
