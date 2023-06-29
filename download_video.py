@@ -1,5 +1,4 @@
 import random
-import string
 from urllib.parse import urlparse
 from pytube import YouTube
 from TikTokApi import TikTokApi
@@ -26,11 +25,8 @@ def download_youtube_video(url):
 
 def download_tiktok_video(url):
     did = str(random.randint(10000, 999999999))
-    print(did)
     with TikTokApi(custom_verify_fp=TIKTOK_VERIFY, use_test_endpoints=True, custom_device_id=did) as api:
         video = api.video(url=url)
-        print(video.id)
-
         video_data = video.bytes()
         with open(FILENAME, "wb") as out_file:
             out_file.write(video_data)
@@ -50,4 +46,4 @@ def download_video(url):
         return download_tiktok_video(url)
     else:
         return {'success': False,
-                'reason': 'Неизвестный URL'}
+                'reason': 'Неизвестный URL. Бот работает с TikTok и YouTube'}
