@@ -26,6 +26,7 @@ def download_tiktok_video(url):
         video_data = video.bytes()
         with open(FILENAME, "wb") as out_file:
             out_file.write(video_data)
+
         return {
             'success': True,
             'file': FILENAME,
