@@ -85,7 +85,6 @@ async def send_log(message):
 async def get_voice(message):
     add_log('get_voice', message)
 
-    await message.delete()
     user_id = message.from_user.id
     categories = os.listdir('voices')
 

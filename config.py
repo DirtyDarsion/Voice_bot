@@ -8,7 +8,7 @@ TOKEN = os.getenv('TOKEN')
 ADMIN = os.getenv('ADMIN')
 TIKTOK_VERIFY = os.getenv('TIKTOK_VERIFY')
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     filename="voice_bot.log",
                     filemode="a",
                     format="%(asctime)s %(levelname)s %(message)s")
@@ -21,14 +21,14 @@ def add_log(def_name, message=None, log_level=2, info=''):
             chat = f'in "{message.chat.title}"({message.chat.id}) '
         else:
             chat = ''
-        text = f' text: "{message.text}"'
+        message_text = f' text: "{message.text}"'
     else:
-        user, chat, text = '', '', ''
+        user, chat, message_text = '', '', ''
 
     if info:
         info = f' info: {info}'
 
-    text = f'{user}{chat}def: {def_name}{text}{info}'
+    text = f'{user}{chat}def: {def_name}{message_text}{info}'
 
     match log_level:
         case 1:
