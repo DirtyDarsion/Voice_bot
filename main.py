@@ -35,11 +35,11 @@ async def start(message):
 async def start(message):
     add_log('start', message)
 
-    await message.answer('Команды:'
-                         '- Вася видео;'
-                         '- Вася текст;'
-                         '- Вася логфайл;'
-                         '- Вася лог;'
+    await message.answer('Команды:\n'
+                         '- Вася видео;\n'
+                         '- Вася текст;\n'
+                         '- Вася логфайл;\n'
+                         '- Вася лог;\n'
                          '- Вася')
 
 
