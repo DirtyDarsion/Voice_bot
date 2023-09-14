@@ -1,9 +1,11 @@
 import os
 import nest_asyncio
 
+import asyncio
+import aioschedule
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
-from aiogram.dispatcher.filters import Command, Text, IDFilter
+from aiogram.dispatcher.filters import Command, Text, IDFilter, ExceptionsFilter
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.callback_data import CallbackData
 
@@ -26,7 +28,19 @@ db = {}
 async def start(message):
     add_log('start', message)
 
-    await message.answer('Напиши вася')
+    await message.answer('Напиши Вася')
+
+
+@dp.message_handler(Command('help'))
+async def start(message):
+    add_log('start', message)
+
+    await message.answer('Команды:'
+                         '- Вася видео;'
+                         '- Вася текст;'
+                         '- Вася логфайл;'
+                         '- Вася лог;'
+                         '- Вася')
 
 
 @dp.message_handler(Text(startswith='вася видео', ignore_case=True))
@@ -75,10 +89,21 @@ async def get_text_from_voice(message):
         await message.answer('Произошла ошибка.')
 
 
+@dp.message_handler(Text(startswith='вася логфайл', ignore_case=True), IDFilter(ADMIN))
+async def send_log(message):
+    add_log('get_logfile', message)
+    await message.reply_document(open('voice_bot.log', 'rb'))
+
+
 @dp.message_handler(Text(startswith='вася лог', ignore_case=True), IDFilter(ADMIN))
 async def send_log(message):
-    add_log('text_from_voice', message)
-    await message.reply_document(open('voice_bot.log', 'rb'))
+    add_log('get_log', message)
+    with open('voice_bot.log', 'r') as log:
+        text = log.readlines()
+        answer = text[-30:]
+        # answer = map(lambda x: x.decode('utf-8'), answer)
+        message_text = ''.join(answer)
+        await message.reply(message_text)
 
 
 @dp.message_handler(Text(startswith='вася', ignore_case=True))
@@ -133,8 +158,33 @@ async def send_voice(call: types.CallbackQuery, callback_data: dict):
         await bot.send_voice(call.message.chat.id, InputFile(path))
 
 
+def log_cleaner():
+    log_length = 3000
+
+    with open('voice_bot.log', 'r') as file:
+        text = file.readlines()
+
+    if len(text) > log_length:
+        add_log('log cleaner', f'len(log) = {len(text)}, cleaning')
+        with open('voice_bot.log', 'w') as file:
+            file.writelines(text[-log_length:])
+
+
+async def scheduler():
+    while True:
+        await aioschedule.run_pending()
+        await asyncio.sleep(86400)
+        log_cleaner()
+
+
+async def on_startup(_):
+    loop = asyncio.get_event_loop()
+    loop.create_task(scheduler())
+
+
 if __name__ == '__main__':
     executor.start_polling(
         dispatcher=dp,
         skip_updates=True,
+        on_startup=on_startup,
     )
