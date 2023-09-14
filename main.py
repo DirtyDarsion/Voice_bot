@@ -5,9 +5,10 @@ import asyncio
 import aioschedule
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
-from aiogram.dispatcher.filters import Command, Text, IDFilter, ExceptionsFilter
+from aiogram.dispatcher.filters import Command, Text, IDFilter
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.callback_data import CallbackData
+from aiogram.utils.exceptions import NetworkError, RetryAfter, TelegramAPIError
 
 from config import add_log, TOKEN, ADMIN
 from voice_to_text import voice_to_text
@@ -156,6 +157,13 @@ async def send_voice(call: types.CallbackQuery, callback_data: dict):
 
         await call.message.delete()
         await bot.send_voice(call.message.chat.id, InputFile(path))
+
+
+@dp.errors_handlers(exception=[NetworkError, RetryAfter, TelegramAPIError])
+async def error_intercept(update: types.Update):
+    add_log('error_intercept', 'перехвачена ошибка', log_level=4)
+
+    return True
 
 
 def log_cleaner():
