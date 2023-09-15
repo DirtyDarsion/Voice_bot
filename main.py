@@ -166,7 +166,7 @@ async def error_intercept(update: types.Update):
 
 
 def log_cleaner():
-    log_length = 10  # 3000
+    log_length = 3000
 
     with open('voice_bot.log', 'r') as file:
         text = file.readlines()
@@ -182,7 +182,7 @@ def log_cleaner():
 async def scheduler():
     while True:
         await aioschedule.run_pending()
-        await asyncio.sleep(10)  # 86400
+        await asyncio.sleep(86400)
         len_log = log_cleaner()
         add_log('log_cleaner', info=f'length = {len_log}')
 
