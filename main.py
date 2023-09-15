@@ -160,7 +160,7 @@ async def send_voice(call: types.CallbackQuery, callback_data: dict):
 
 @dp.errors_handler(exception=[NetworkError, RetryAfter, TelegramAPIError])
 async def error_intercept(update: types.Update):
-    add_log('error_intercept', 'перехвачена ошибка', log_level=4)
+    add_log('error_intercept', info='перехвачена ошибка', log_level=4)
 
     return True
 
