@@ -159,7 +159,7 @@ async def send_voice(call: types.CallbackQuery, callback_data: dict):
         await bot.send_voice(call.message.chat.id, InputFile(path))
 
 
-@dp.errors_handlers(exception=[NetworkError, RetryAfter, TelegramAPIError])
+@dp.errors_handler(exception=[NetworkError, RetryAfter, TelegramAPIError])
 async def error_intercept(update: types.Update):
     add_log('error_intercept', 'перехвачена ошибка', log_level=4)
 
