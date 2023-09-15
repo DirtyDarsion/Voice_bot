@@ -21,7 +21,7 @@ def add_log(def_name, message=None, log_level=2, info=''):
             chat = f'in "{message.chat.title}"({message.chat.id}) '
         else:
             chat = ''
-        message_text = f' text: "{message.text}"'
+        message_text = f' message_text: "{message.text}"'
     else:
         user, chat, message_text = '', '', ''
 
