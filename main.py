@@ -181,7 +181,7 @@ def log_cleaner():
 async def scheduler():
     while True:
         await aioschedule.run_pending()
-        await asyncio.sleep(86400)
+        await asyncio.sleep(10)  # 86400
         log_cleaner()
 
 
