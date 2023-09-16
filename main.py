@@ -171,7 +171,8 @@ async def send_log(message):
         text = log.readlines()
         answer = text[-30:]
         message_text = ''.join(answer)
-        await message.reply(message_text)
+        message_text += f'\nВсего строк в логе: <b>{len(text)}</b>'
+        await message.reply(message_text, parse_mode='HTML')
 
 
 @dp.errors_handler(exception=[NetworkError, RetryAfter, TelegramAPIError])
