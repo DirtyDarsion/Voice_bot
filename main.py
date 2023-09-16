@@ -30,17 +30,18 @@ db = {}
 async def start(message):
     add_log('start', message)
 
-    await message.answer('Напиши Вася')
+    await message.answer('Напиши "Вася команды"')
 
 
-@dp.message_handler(Command('help'))
+@dp.message_handler(Text(startswith='вася команды', ignore_case=True))
 async def start(message):
     add_log('start', message)
 
-    await message.answer('Команды:\n'
-                         '- Вася видео;\n'
-                         '- Вася текст;\n'
-                         '- Вася')
+    await message.answer('Команды бота:\n'
+                         '- Вася видео <ссылка на видео> - загрузка видео из других источников в диалог;\n'
+                         '- Вася текст - к сообщению должно быть прикреплено ГС, бот переведет в текст;\n'
+                         '- Вася мем;\n'
+                         '- Вася <любой текст> - ChatGPT.')
 
 
 @dp.message_handler(Text(startswith='вася видео', ignore_case=True))
