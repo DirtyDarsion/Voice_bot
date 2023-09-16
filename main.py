@@ -1,5 +1,6 @@
 import os
 import nest_asyncio
+import openai
 
 import asyncio
 import aioschedule
@@ -10,7 +11,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import NetworkError, RetryAfter, TelegramAPIError
 
-from config import add_log, TOKEN, ADMIN
+from config import add_log, TOKEN, ADMIN, OPEN_AI_KEY
 from voice_to_text import voice_to_text
 from download_video import download_video
 
@@ -39,8 +40,6 @@ async def start(message):
     await message.answer('Команды:\n'
                          '- Вася видео;\n'
                          '- Вася текст;\n'
-                         '- Вася логфайл;\n'
-                         '- Вася лог;\n'
                          '- Вася')
 
 
@@ -90,23 +89,7 @@ async def get_text_from_voice(message):
         await message.answer('Произошла ошибка.')
 
 
-@dp.message_handler(Text(startswith='логфайл', ignore_case=True), IDFilter(ADMIN))
-async def send_log(message):
-    add_log('get_logfile', message)
-    await message.reply_document(open('voice_bot.log', 'rb'))
-
-
-@dp.message_handler(Text(startswith='лог', ignore_case=True), IDFilter(ADMIN))
-async def send_log(message):
-    add_log('get_log', message)
-    with open('voice_bot.log', 'r') as log:
-        text = log.readlines()
-        answer = text[-30:]
-        message_text = ''.join(answer)
-        await message.reply(message_text)
-
-
-@dp.message_handler(Text(startswith='вася', ignore_case=True))
+@dp.message_handler(Text(startswith='вася мем', ignore_case=True))
 async def get_voice(message):
     add_log('get_voice', message)
 
@@ -158,6 +141,39 @@ async def send_voice(call: types.CallbackQuery, callback_data: dict):
         await bot.send_voice(call.message.chat.id, InputFile(path))
 
 
+@dp.message_handler(Text(startswith='вася', ignore_case=True))
+async def get_chat_gpt(message):
+    add_log('get_chat_gpt', message)
+
+    if len(message.text) > 5:
+        completion = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {'role': 'user', 'content': message.text[5:]},
+            ],
+        )
+
+        await message.reply(completion.choices[0].message.content)
+    else:
+        return await message.reply('Введите вопрос.')
+
+
+@dp.message_handler(Text(startswith='логфайл', ignore_case=True), IDFilter(ADMIN))
+async def send_log(message):
+    add_log('get_logfile', message)
+    await message.reply_document(open('voice_bot.log', 'rb'))
+
+
+@dp.message_handler(Text(startswith='лог', ignore_case=True), IDFilter(ADMIN))
+async def send_log(message):
+    add_log('get_log', message)
+    with open('voice_bot.log', 'r') as log:
+        text = log.readlines()
+        answer = text[-30:]
+        message_text = ''.join(answer)
+        await message.reply(message_text)
+
+
 @dp.errors_handler(exception=[NetworkError, RetryAfter, TelegramAPIError])
 async def error_intercept(update: types.Update):
     add_log('error_intercept', info='перехвачена ошибка', log_level=4)
@@ -188,6 +204,8 @@ async def scheduler():
 
 
 async def on_startup(_):
+    openai.api_key = OPEN_AI_KEY
+
     loop = asyncio.get_event_loop()
     loop.create_task(scheduler())
 
