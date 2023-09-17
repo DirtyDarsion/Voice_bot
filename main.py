@@ -176,9 +176,9 @@ async def send_log(message):
         await message.reply(message_text, parse_mode='HTML')
 
 
-@dp.errors_handler(exception=[NetworkError, RetryAfter, TelegramAPIError])
+@dp.errors_handler(exception=TelegramAPIError)
 async def error_intercept(update: types.Update):
-    add_log('error_intercept', info='перехвачена ошибка', log_level=4)
+    add_log('error_intercept', info='перехвачена ошибка TelegramAPIError', log_level=4)
 
     return True
 
