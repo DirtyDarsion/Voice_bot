@@ -1,3 +1,4 @@
+import json
 import os
 import nest_asyncio
 import openai
@@ -147,16 +148,34 @@ async def get_chat_gpt(message):
     add_log('get_chat_gpt', message)
 
     if len(message.text) > 5:
+        path = f'chatgpt_history/{message.chat.id}.json'
+
+        if os.path.exists(path):
+            with open(path, 'r', encoding='UTF-8') as file:
+                messages = json.load(file)
+            if len(messages) > 100:
+                messages = messages[-100:]
+        else:
+            messages = [{'role': 'system', 'content': 'You are a helpful assistant.'}]
+
+        messages.append({'role': 'user', 'content': message.text[5:]})
         completion = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {'role': 'user', 'content': message.text[5:]},
-            ],
+            messages=messages,
         )
+        messages.append(
+            {
+                'role': 'assistant',
+                'content': str(completion.choices[0].message.content),
+            }
+        )
+
+        with open(path, 'w', encoding='UTF-8') as file:
+            json.dump(messages, file, ensure_ascii=False)
 
         await message.reply(completion.choices[0].message.content)
     else:
-        return await message.reply('Введите вопрос.')
+        return await message.reply('Что?')
 
 
 @dp.message_handler(Text(startswith='логфайл', ignore_case=True), IDFilter(ADMIN))
