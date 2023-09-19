@@ -203,7 +203,7 @@ async def error_intercept(update: types.Update):
 
 
 def log_cleaner():
-    log_length = 10
+    log_length = 3000
 
     with open('voice_bot.log', 'r') as file:
         text = file.readlines()
@@ -217,7 +217,7 @@ def log_cleaner():
 
 
 def background_jobs():
-    scheduler.add_job(log_cleaner, 'interval', seconds=5)
+    scheduler.add_job(log_cleaner, 'interval', hours=24)
 
 
 async def on_startup(_):
