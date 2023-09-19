@@ -2,15 +2,14 @@ import json
 import os
 import nest_asyncio
 import openai
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-import asyncio
-import aioschedule
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
 from aiogram.dispatcher.filters import Command, Text, IDFilter
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.callback_data import CallbackData
-from aiogram.utils.exceptions import NetworkError, RetryAfter, TelegramAPIError
+from aiogram.utils.exceptions import TelegramAPIError
 
 from config import add_log, TOKEN, ADMIN, OPEN_AI_KEY
 from voice_to_text import voice_to_text
@@ -20,6 +19,7 @@ nest_asyncio.apply()
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
+scheduler = AsyncIOScheduler()
 
 dir_set = CallbackData('dir', 'user_id', 'dir')
 voice_set = CallbackData('voi', 'user_id', 'voice')
@@ -203,7 +203,7 @@ async def error_intercept(update: types.Update):
 
 
 def log_cleaner():
-    log_length = 3000
+    log_length = 10
 
     with open('voice_bot.log', 'r') as file:
         text = file.readlines()
@@ -216,22 +216,18 @@ def log_cleaner():
     return length
 
 
-async def scheduler():
-    while True:
-        await aioschedule.run_pending()
-        await asyncio.sleep(86400)
-        len_log = log_cleaner()
-        add_log('log_cleaner', info=f'length = {len_log}')
+def background_jobs():
+    scheduler.add_job(log_cleaner, 'interval', seconds=5)
 
 
 async def on_startup(_):
     openai.api_key = OPEN_AI_KEY
 
-    loop = asyncio.get_event_loop()
-    loop.create_task(scheduler())
+    background_jobs()
 
 
 if __name__ == '__main__':
+    scheduler.start()
     executor.start_polling(
         dispatcher=dp,
         skip_updates=True,
