@@ -197,7 +197,21 @@ async def send_log(message):
 
 @dp.errors_handler(exception=TelegramAPIError)
 async def error_intercept(update: types.Update):
-    add_log('error_intercept', info='перехвачена ошибка TelegramAPIError', log_level=4)
+    add_log('error_intercept', info='перехвачена ошибка TelegramAPIError без кавычек', log_level=4)
+
+    return True
+
+
+@dp.errors_handler(exception='TelegramAPIError')
+async def error_intercept(update: types.Update):
+    add_log('error_intercept', info='перехвачена ошибка TelegramAPIError с кавычками', log_level=4)
+
+    return True
+
+
+@dp.errors_handler(exception="Bad Gateway")
+async def error_intercept(update: types.Update):
+    add_log('error_intercept', info='перехвачена ошибка Bad Gateway', log_level=4)
 
     return True
 
@@ -211,7 +225,7 @@ def log_cleaner():
     length = len(text)
     if length > log_length:
         with open('voice_bot.log', 'w') as file:
-            file.writelines(text[-log_length:])
+            file.writelines(text[-(log_length-100):])
 
     return length
 
