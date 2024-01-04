@@ -7,11 +7,9 @@ load_dotenv()
 TOKEN = os.getenv('TOKEN')
 ADMIN = os.getenv('ADMIN')
 TIKTOK_VERIFY = os.getenv('TIKTOK_VERIFY')
-OPEN_AI_KEY = os.getenv('OPEN_AI_KEY')
 
 logging.basicConfig(level=logging.INFO,
                     filename="voice_bot.log",
-                    filemode="a",
                     format="%(asctime)s %(levelname)s %(message)s")
 
 

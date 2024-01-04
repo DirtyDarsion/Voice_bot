@@ -1,7 +1,5 @@
-import json
 import os
 import nest_asyncio
-import openai
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from aiogram import Bot, Dispatcher, executor, types
@@ -11,7 +9,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.exceptions import TelegramAPIError
 
-from config import add_log, TOKEN, ADMIN, OPEN_AI_KEY
+from config import add_log, TOKEN, ADMIN
 from voice_to_text import voice_to_text
 from download_video import download_video
 
@@ -41,8 +39,7 @@ async def start(message):
     await message.answer('Команды бота:\n'
                          '- Вася видео <ссылка на видео> - загрузка видео из других источников в диалог;\n'
                          '- Вася текст - к сообщению должно быть прикреплено ГС, бот переведет в текст;\n'
-                         '- Вася мем;\n'
-                         '- Вася <любой текст> - ChatGPT.')
+                         '- Вася мем.')
 
 
 @dp.message_handler(Text(startswith='вася видео', ignore_case=True))
@@ -143,41 +140,6 @@ async def send_voice(call: types.CallbackQuery, callback_data: dict):
         await bot.send_voice(call.message.chat.id, InputFile(path))
 
 
-@dp.message_handler(Text(startswith='вася', ignore_case=True))
-async def get_chat_gpt(message):
-    add_log('get_chat_gpt', message)
-
-    if len(message.text) > 5:
-        path = f'chatgpt_history/{message.chat.id}.json'
-
-        if os.path.exists(path):
-            with open(path, 'r', encoding='UTF-8') as file:
-                messages = json.load(file)
-            if len(messages) > 100:
-                messages = messages[-100:]
-        else:
-            messages = [{'role': 'system', 'content': 'You are a helpful assistant.'}]
-
-        messages.append({'role': 'user', 'content': message.text[5:]})
-        completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=messages,
-        )
-        messages.append(
-            {
-                'role': 'assistant',
-                'content': str(completion.choices[0].message.content),
-            }
-        )
-
-        with open(path, 'w', encoding='UTF-8') as file:
-            json.dump(messages, file, ensure_ascii=False)
-
-        await message.reply(completion.choices[0].message.content)
-    else:
-        return await message.reply('Что?')
-
-
 @dp.message_handler(Text(startswith='логфайл', ignore_case=True), IDFilter(ADMIN))
 async def send_log(message):
     add_log('get_logfile', message)
@@ -235,7 +197,8 @@ def background_jobs():
 
 
 async def on_startup(_):
-    openai.api_key = OPEN_AI_KEY
+    print(f'Path to log: {os.getcwd()}/voice_bot.log')
+    print('Start polling...')
 
     background_jobs()
 
