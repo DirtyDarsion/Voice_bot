@@ -9,7 +9,8 @@ ADMIN = os.getenv('ADMIN')
 TIKTOK_VERIFY = os.getenv('TIKTOK_VERIFY')
 
 logging.basicConfig(level=logging.INFO,
-                    filename="voice_bot.log",
+                    filename="logfile.log",
+                    filemode="w",
                     format="%(asctime)s %(levelname)s %(message)s")
 
 

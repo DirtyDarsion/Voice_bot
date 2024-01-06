@@ -1,13 +1,11 @@
 import os
 import nest_asyncio
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
-from aiogram.dispatcher.filters import Command, Text, IDFilter
+from aiogram.dispatcher.filters import Command, Text, IDFilter, ContentTypeFilter
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.callback_data import CallbackData
-from aiogram.utils.exceptions import TelegramAPIError
 
 from config import add_log, TOKEN, ADMIN
 from voice_to_text import voice_to_text
@@ -17,7 +15,6 @@ nest_asyncio.apply()
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
-scheduler = AsyncIOScheduler()
 
 dir_set = CallbackData('dir', 'user_id', 'dir')
 voice_set = CallbackData('voi', 'user_id', 'voice')
@@ -32,13 +29,30 @@ async def start(message):
     await message.answer('Напиши "Вася команды"')
 
 
+@dp.message_handler(Command('logfile'), IDFilter(ADMIN))
+async def send_log(message):
+    add_log('get_logfile', message)
+    await message.reply_document(open('voice_bot.log', 'rb'))
+
+
+@dp.message_handler(Command('log'), IDFilter(ADMIN))
+async def send_log(message):
+    add_log('get_log', message)
+    with open('voice_bot.log', 'r') as log:
+        text = log.readlines()
+        answer = text[-30:]
+        message_text = ''.join(answer)
+        message_text += f'\nВсего строк в логе: <b>{len(text)}</b>'
+        await message.reply(message_text, parse_mode='HTML')
+
+
 @dp.message_handler(Text(startswith='вася команды', ignore_case=True))
 async def start(message):
     add_log('start', message)
 
     await message.answer('Команды бота:\n'
                          '- Вася видео <ссылка на видео> - загрузка видео из других источников в диалог;\n'
-                         '- Вася текст - к сообщению должно быть прикреплено ГС, бот переведет в текст;\n'
+                         '- Вася текст - перевести в текст прикрепленное аудио, можно отправить просто гс;\n'
                          '- Вася мем.')
 
 
@@ -75,6 +89,25 @@ async def get_text_from_voice(message):
 
     try:
         file_id = message.reply_to_message.voice.file_id
+        file = await bot.get_file(file_id)
+        file_path = file.file_path
+        local_path = 'voices/temp.mp3'
+        await bot.download_file(file_path, local_path)
+
+        temp_message = await message.reply('Работаю')
+        text = voice_to_text(local_path)
+
+        await temp_message.edit_text(text)
+    except TypeError and AttributeError:
+        await message.answer('Произошла ошибка.')
+
+
+@dp.message_handler(ContentTypeFilter('VOICE'))
+async def get_text_from_voice2(message):
+    add_log('get_text_from_voice2', message)
+
+    try:
+        file_id = message.voice.file_id
         file = await bot.get_file(file_id)
         file_path = file.file_path
         local_path = 'voices/temp.mp3'
@@ -140,71 +173,12 @@ async def send_voice(call: types.CallbackQuery, callback_data: dict):
         await bot.send_voice(call.message.chat.id, InputFile(path))
 
 
-@dp.message_handler(Text(startswith='логфайл', ignore_case=True), IDFilter(ADMIN))
-async def send_log(message):
-    add_log('get_logfile', message)
-    await message.reply_document(open('voice_bot.log', 'rb'))
-
-
-@dp.message_handler(Text(startswith='лог', ignore_case=True), IDFilter(ADMIN))
-async def send_log(message):
-    add_log('get_log', message)
-    with open('voice_bot.log', 'r') as log:
-        text = log.readlines()
-        answer = text[-30:]
-        message_text = ''.join(answer)
-        message_text += f'\nВсего строк в логе: <b>{len(text)}</b>'
-        await message.reply(message_text, parse_mode='HTML')
-
-
-@dp.errors_handler(exception=TelegramAPIError)
-async def error_intercept(update: types.Update):
-    add_log('error_intercept', info='перехвачена ошибка TelegramAPIError без кавычек', log_level=4)
-
-    return True
-
-
-@dp.errors_handler(exception='TelegramAPIError')
-async def error_intercept(update: types.Update):
-    add_log('error_intercept', info='перехвачена ошибка TelegramAPIError с кавычками', log_level=4)
-
-    return True
-
-
-@dp.errors_handler(exception="Bad Gateway")
-async def error_intercept(update: types.Update):
-    add_log('error_intercept', info='перехвачена ошибка Bad Gateway', log_level=4)
-
-    return True
-
-
-def log_cleaner():
-    log_length = 3000
-
-    with open('voice_bot.log', 'r') as file:
-        text = file.readlines()
-
-    length = len(text)
-    if length > log_length:
-        with open('voice_bot.log', 'w') as file:
-            file.writelines(text[-(log_length-100):])
-
-    return length
-
-
-def background_jobs():
-    scheduler.add_job(log_cleaner, 'interval', hours=24)
-
-
 async def on_startup(_):
     print(f'Path to log: {os.getcwd()}/voice_bot.log')
     print('Start polling...')
 
-    background_jobs()
-
 
 if __name__ == '__main__':
-    scheduler.start()
     executor.start_polling(
         dispatcher=dp,
         skip_updates=True,
