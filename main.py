@@ -3,7 +3,7 @@ import nest_asyncio
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputFile
-from aiogram.dispatcher.filters import Command, Text, IDFilter, ContentTypeFilter
+from aiogram.dispatcher.filters import Command, Text, IDFilter
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.callback_data import CallbackData
 
@@ -87,6 +87,10 @@ async def get_video(message):
 async def get_text_from_voice(message):
     add_log('get_text_from_voice', message)
 
+    if 'reply_to_message' not in message:
+        await message.answer('Нет голосового сообщения.')
+        return
+
     try:
         file_id = message.reply_to_message.voice.file_id
         file = await bot.get_file(file_id)
@@ -94,7 +98,7 @@ async def get_text_from_voice(message):
         local_path = 'voices/temp.mp3'
         await bot.download_file(file_path, local_path)
 
-        temp_message = await message.reply('Работаю')
+        temp_message = await message.reply('Ожидайте...')
         text = voice_to_text(local_path)
 
         await temp_message.edit_text(text)
@@ -102,7 +106,7 @@ async def get_text_from_voice(message):
         await message.answer('Произошла ошибка.')
 
 
-@dp.message_handler(ContentTypeFilter('VOICE'))
+@dp.message_handler(content_types=[types.ContentType.VOICE])
 async def get_text_from_voice2(message):
     add_log('get_text_from_voice2', message)
 
