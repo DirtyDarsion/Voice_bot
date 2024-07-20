@@ -1,0 +1,4 @@
+TOKEN = <Telegram Bot TOKEN(str)>
+ADMIN = <Telegram ID(int)>
+
+LOGFILE_NAME = logfile.log
