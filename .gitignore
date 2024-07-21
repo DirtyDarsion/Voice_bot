@@ -1,8 +1,6 @@
-.env
 config.py
 logfile.log
 future.py
-requirements-old.txt
 routers/download_video.py
 
 .idea/
