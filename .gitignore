@@ -1,4 +1,4 @@
-Xconfig.py
+config.py
 logfile.log
 future.py
 routers/download_video.py
