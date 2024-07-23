@@ -1,4 +1,11 @@
 TOKEN = <Telegram Bot TOKEN(str)>
 ADMIN = <Telegram ID(int)>
 
-LOGFILE_NAME = logfile.log
+YANDEX_API_KEY = str
+
+LOGFILE_NAME = 'logfile.log'
+
+DB_HOST = str
+DB_NAME = str
+DB_USER = str
+DB_PASS = str
