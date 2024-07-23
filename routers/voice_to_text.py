@@ -18,7 +18,7 @@ router = Router()
 '''
 
 
-def voice_to_text(path):
+def voice_to_text(path) -> str:
     # Change format to wav
     data, samplerate = soundfile.read(path)
     soundfile.write('voices/temp.wav', data, samplerate)
@@ -38,15 +38,18 @@ def voice_to_text(path):
 
 
 @router.message(Text('вася текст'))
-async def get_text_from_voice(message: Message, bot: Bot, main=True):
+async def get_text_from_voice(message: Message, bot: Bot, main_def=True) -> None:
     add_log('get_text_from_voice', message)
-    if main:
-        if not message.reply_to_message.voice:
-            await message.answer('Нет голосового сообщения.')
+    if main_def:
+        if not message.reply_to_message:
+            await message.answer('Перешлите сообщение с прикрепленным аудио.')
+            return
+        elif not message.reply_to_message.voice:
+            await message.answer('В вашем сообщении нет аудиофайла.')
             return
 
     try:
-        if main:
+        if main_def:
             file_id = message.reply_to_message.voice.file_id
         else:
             file_id = message.voice.file_id
@@ -64,5 +67,5 @@ async def get_text_from_voice(message: Message, bot: Bot, main=True):
 
 
 @router.message(F.voice)
-async def get_text_from_voice2(message: Message, bot: Bot):
-    await get_text_from_voice(message, bot, main=False)
+async def get_text_from_voice2(message: Message, bot: Bot) -> None:
+    await get_text_from_voice(message, bot, main_def=False)

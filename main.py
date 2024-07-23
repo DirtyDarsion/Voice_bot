@@ -4,7 +4,7 @@ import asyncio
 from aiogram import Bot, Dispatcher
 
 from config import TOKEN
-from routers import service, voice_to_text, mem
+from routers import service, voice_to_text, mem, weather
 
 
 bot = Bot(token=TOKEN)
@@ -13,10 +13,11 @@ dp.include_routers(
     service.router,
     voice_to_text.router,
     mem.router,
+    weather.router,
 )
 
 
-async def main():
+async def main() -> None:
     print(f'Path to log: {os.getcwd()}/voice_bot.log')
     print('Start polling...')
 

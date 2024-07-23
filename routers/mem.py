@@ -2,7 +2,7 @@ import os
 
 from aiogram import Bot, Router
 from aiogram.types import Message, CallbackQuery, FSInputFile
-from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardButton
 from aiogram.filters.callback_data import CallbackData
 
 from logger import add_log
@@ -24,8 +24,8 @@ class VoiceSet(CallbackData, prefix='voice'):
 db = {}
 
 
-@router.message(Text('вася мем', ignore_case=True))
-async def get_voice(message: Message):
+@router.message(Text('вася мем'))
+async def get_voice(message: Message) -> None:
     add_log('get_voice', message)
 
     user_id = message.from_user.id
@@ -45,7 +45,7 @@ async def get_voice(message: Message):
 
 
 @router.callback_query(DirSet.filter())
-async def choose_voice(callback: CallbackQuery, callback_data: DirSet, bot: Bot):
+async def choose_voice(callback: CallbackQuery, callback_data: DirSet, bot: Bot) -> None:
     user_id = callback_data.user_id
 
     if callback.from_user.id != int(user_id):
@@ -73,7 +73,7 @@ async def choose_voice(callback: CallbackQuery, callback_data: DirSet, bot: Bot)
 
 
 @router.callback_query(VoiceSet.filter())
-async def send_voice(callback: CallbackQuery, callback_data: VoiceSet, bot: Bot):
+async def send_voice(callback: CallbackQuery, callback_data: VoiceSet, bot: Bot) -> None:
     user_id = callback_data.user_id
 
     if callback.from_user.id != int(user_id):
