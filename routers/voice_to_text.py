@@ -4,6 +4,7 @@ import speech_recognition
 
 from aiogram import Router, Bot, F
 from aiogram.types import Message
+from aiogram.filters.command import Command
 
 from filters import Text
 from logger import add_log
@@ -19,12 +20,15 @@ router = Router()
 
 
 def voice_to_text(path) -> str:
+    # new_path = 'voices/temp.wav'
+    new_path = path[:-3] + 'wav'
+    print(new_path)
+
     # Change format to wav
     data, samplerate = soundfile.read(path)
-    soundfile.write('voices/temp.wav', data, samplerate)
+    soundfile.write(new_path, data, samplerate)
 
     # Get text in wav
-    new_path = 'voices/temp.wav'
     r = speech_recognition.Recognizer()
 
     with speech_recognition.AudioFile(new_path) as file:
@@ -37,6 +41,7 @@ def voice_to_text(path) -> str:
     return r.recognize_google(audio, language="ru-RU")
 
 
+@router.message(Command('text'))
 @router.message(Text('вася текст'))
 async def get_text_from_voice(message: Message, bot: Bot, main_def=True) -> None:
     add_log('get_text_from_voice', message)
@@ -55,7 +60,7 @@ async def get_text_from_voice(message: Message, bot: Bot, main_def=True) -> None
             file_id = message.voice.file_id
         file = await bot.get_file(file_id)
         file_path = file.file_path
-        local_path = 'voices/temp.mp3'
+        local_path = f'voices/{message.message_id}.mp3'
         await bot.download_file(file_path, local_path)
 
         temp_message = await message.reply('Ожидайте...')

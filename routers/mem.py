@@ -3,6 +3,7 @@ import os
 from aiogram import Bot, Router
 from aiogram.types import Message, CallbackQuery, FSInputFile
 from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardButton
+from aiogram.filters.command import Command
 from aiogram.filters.callback_data import CallbackData
 
 from logger import add_log
@@ -24,6 +25,7 @@ class VoiceSet(CallbackData, prefix='voice'):
 db = {}
 
 
+@router.message(Command('mem'))
 @router.message(Text('вася мем'))
 async def get_voice(message: Message) -> None:
     add_log('get_voice', message)

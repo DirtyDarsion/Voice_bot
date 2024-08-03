@@ -36,6 +36,7 @@ async def send_news(user_id, bot: Bot) -> None:
     await bot.send_photo(user_id, photo=photo, caption=text, parse_mode='HTML')
 
 
+@router.message(Command('weather'))
 @router.message(Text('вася погода'))
 async def send_weather(message: Message, bot: Bot) -> None:
     add_log('send_weather', message)

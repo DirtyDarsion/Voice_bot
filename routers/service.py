@@ -35,13 +35,13 @@ async def send_log(message: Message) -> None:
     await message.reply_document(open(LOGFILE_NAME, 'rb'))
 
 
-# Аналог /help
+# Помощь
+@router.message(Command('help'))
 @router.message(Text('вася команды'))
 async def start(message) -> None:
     add_log('start', message)
 
     await message.answer('Команды бота:\n'
-                         '- Вася текст - перевести в текст прикрепленное аудио, можно отправить просто гс;\n'
-                         '- Вася мем - отправить голосовые отрывки из мемов;\n'
-                         '- Вася погода - получить актуальные данные о погоде и валюте;\n'
-                         '- /setcity - изменить данные о городе.')
+                         '- Вася текст или /text - перевести в текст прикрепленное аудио\n'
+                         '- Вася мем или /mem - отправить голосовые отрывки из мемов\n'
+                         '- Вася погода или /weather - получить актуальные данные о погоде и валюте')

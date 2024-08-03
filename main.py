@@ -3,7 +3,7 @@ import asyncio
 
 from aiogram import Bot, Dispatcher
 
-from config import TOKEN
+from config import TOKEN, LOGFILE_NAME
 from routers import service, voice_to_text, mem, weather
 
 
@@ -18,7 +18,7 @@ dp.include_routers(
 
 
 async def main() -> None:
-    print(f'Path to log: {os.getcwd()}/voice_bot.log')
+    print(f'Path to log: {os.getcwd()}/{LOGFILE_NAME}')
     print('Start polling...')
 
     await bot.delete_webhook(drop_pending_updates=True)
