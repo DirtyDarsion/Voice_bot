@@ -20,9 +20,7 @@ router = Router()
 
 
 def voice_to_text(path) -> str:
-    # new_path = 'voices/temp.wav'
     new_path = path[:-3] + 'wav'
-    print(new_path)
 
     # Change format to wav
     data, samplerate = soundfile.read(path)
@@ -60,14 +58,14 @@ async def get_text_from_voice(message: Message, bot: Bot, main_def=True) -> None
             file_id = message.voice.file_id
         file = await bot.get_file(file_id)
         file_path = file.file_path
-        local_path = f'voices/{message.message_id}.mp3'
+        local_path = f'voices/{message.chat.id}{message.message_id}.mp3'
         await bot.download_file(file_path, local_path)
 
         temp_message = await message.reply('Ожидайте...')
         text = voice_to_text(local_path)
 
         await temp_message.edit_text(text)
-    except TypeError and AttributeError:
+    except TypeError or AttributeError:
         await message.answer('Произошла ошибка при обработке файла.')
 
 
