@@ -1,13 +1,17 @@
 import logging
+from datetime import date
 from config import LOGFILE_NAME
 
+logname = date.today().strftime('%Y-%m-%d ') + LOGFILE_NAME
+
 logging.basicConfig(level=logging.INFO,
-                    filename=LOGFILE_NAME,
-                    filemode="w",
+                    filename=f'logs/{logname}',
+                    filemode="a",
                     format="%(asctime)s %(levelname)s %(message)s")
 
 
 def add_log(def_name, message=None, log_level=2, info=''):
+    print()
     if message:
         user = f'{message.from_user.username}({message.from_user.id}) '
         if message.chat.type == 'group':

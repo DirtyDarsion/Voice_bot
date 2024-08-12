@@ -1,8 +1,10 @@
+*.log
 config.py
 logfile.log
 future.py
 routers/download_video.py
 
 .idea/
+logs
 __pycache__/
 */__pycache__/
