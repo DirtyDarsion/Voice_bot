@@ -3,7 +3,7 @@ ADMIN = <Telegram ID(int)>
 
 YANDEX_API_KEY = str
 
-LOGFILE_NAME = 'logfile.log'
+LOGFILE_NAME = 'log.log'
 
 DB_HOST = str
 DB_NAME = str
