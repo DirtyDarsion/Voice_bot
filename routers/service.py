@@ -3,8 +3,7 @@ from aiogram.types import Message
 from aiogram.filters.command import Command
 
 from filters import ItsMe, Text
-from logger import add_log
-from config import LOGFILE_NAME
+from logger import add_log, logname
 
 router = Router()
 
@@ -20,7 +19,7 @@ async def start(message: Message) -> None:
 @router.message(Command('log'), ItsMe())
 async def send_log(message: Message) -> None:
     add_log('get_log', message)
-    with open(LOGFILE_NAME, 'r') as log:
+    with open(f'logs/{logname}', 'r') as log:
         text = log.readlines()
         answer = text[-30:]
         message_text = ''.join(answer)
@@ -32,7 +31,7 @@ async def send_log(message: Message) -> None:
 @router.message(Command('logfile'), ItsMe())
 async def send_log(message: Message) -> None:
     add_log('get_logfile', message)
-    await message.reply_document(open(LOGFILE_NAME, 'rb'))
+    await message.reply_document(open(f'logs/{logname}', 'rb'))
 
 
 # Помощь
