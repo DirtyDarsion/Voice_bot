@@ -8,7 +8,7 @@ from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
-from config import TOKEN
+from config import TOKEN, SET_WEBHOOK
 from logger import logname
 from routers import service, voice_to_text, mem, weather
 
@@ -62,5 +62,25 @@ def main() -> None:
     web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)
 
 
+async def main_polling() -> None:
+    print(f'Path to log: {os.getcwd()}/{logname}')
+    print('Start polling...')
+
+    bot = Bot(token=TOKEN)
+    dp = Dispatcher()
+    dp.include_routers(
+        service.router,
+        voice_to_text.router,
+        mem.router,
+        weather.router,
+    )
+
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot)
+
+
 if __name__ == '__main__':
-    main()
+    if SET_WEBHOOK:
+        main()
+    else:
+        asyncio.run(main_polling())
