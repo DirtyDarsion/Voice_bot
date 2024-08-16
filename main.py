@@ -24,7 +24,7 @@ async def on_startup(bot: Bot) -> None:
     await bot.set_webhook(f"{BASE_WEBHOOK_URL}{WEBHOOK_PATH}", secret_token=WEBHOOK_SECRET)
 
 
-async def main() -> None:
+def main() -> None:
     print(f'Path to log: {os.getcwd()}/{logname}')
 
     dp = Dispatcher()
