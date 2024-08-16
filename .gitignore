@@ -4,7 +4,6 @@ logfile.log
 future.py
 routers/download_video.py
 test.py
-main-OLD.py
 
 .idea/
 logs

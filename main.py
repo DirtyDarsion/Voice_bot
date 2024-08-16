@@ -8,15 +8,15 @@ from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 
-from config import TOKEN, SET_WEBHOOK
+from config import TOKEN, SET_WEBHOOK, SECRET_WEBHOOK
 from logger import logname
 from routers import service, voice_to_text, mem, weather
 
 WEB_SERVER_HOST = "127.0.0.1"
 WEB_SERVER_PORT = 8080
 
-WEBHOOK_PATH = "/webhook"
-WEBHOOK_SECRET = "my-secret"
+WEBHOOK_PATH = "/webhook/voicebot"
+WEBHOOK_SECRET = SECRET_WEBHOOK
 BASE_WEBHOOK_URL = "https://serjo.site"
 
 
