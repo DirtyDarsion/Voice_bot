@@ -1,4 +1,5 @@
 SET_WEBHOOK = bool
+SECRET_WEBHOOK = str
 TOKEN = <Telegram Bot TOKEN(str)>
 ADMIN = <Telegram ID(int)>
 
