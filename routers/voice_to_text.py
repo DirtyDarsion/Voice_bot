@@ -20,6 +20,7 @@ router = Router()
 
 
 def voice_to_text(path) -> str:
+    print('START')
     new_path = path[:-3] + 'wav'
 
     # Read mp3
@@ -31,8 +32,9 @@ def voice_to_text(path) -> str:
 
     # Get text in wav
     r = speech_recognition.Recognizer()
-
+    print('START cycle')
     for i in range(count):
+        print(f'START cycle {i}')
         temp_audio = audio_file[90000 * i:90000 * (i + 1)]
         temp_audio.export(new_path, format="wav")
         with speech_recognition.AudioFile(new_path) as file:
@@ -42,9 +44,10 @@ def voice_to_text(path) -> str:
             output += test
 
         os.remove(new_path)
+        print(f'END cycle {i}')
 
     os.remove(path)
-
+    print('END')
     return output
 
 
