@@ -36,12 +36,19 @@ def voice_to_text(path) -> str:
     for i in range(count):
         print(f'START cycle {i}')
         temp_audio = audio_file[90000 * i:90000 * (i + 1)]
+        print(f'.')
         temp_audio.export(new_path, format="wav")
+        print(f'..')
         with speech_recognition.AudioFile(new_path) as file:
+            print(f'...')
             audio = r.record(file)
+            print(f'....')
             r.adjust_for_ambient_noise(file)
+            print(f'.....')
             test = r.recognize_google(audio, language="ru-RU")
+            print(test)
             output += test
+            print(output)
 
         os.remove(new_path)
         print(f'END cycle {i}')
