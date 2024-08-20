@@ -1,6 +1,6 @@
 import os
-import soundfile
 import speech_recognition
+from pydub import AudioSegment
 
 from aiogram import Router, Bot, F
 from aiogram.types import Message
@@ -19,31 +19,41 @@ router = Router()
 '''
 
 
-def voice_to_text(path) -> str:
+async def voice_to_text(path) -> str:
     new_path = path[:-3] + 'wav'
 
-    # Change format to wav
-    data, samplerate = soundfile.read(path)
-    soundfile.write(new_path, data, samplerate)
+    # Read mp3
+    audio_file = AudioSegment.from_file(path)
+
+    # Cut the audio track if it is longer than 90 seconds
+    count = int(audio_file.duration_seconds // 90 + (1 if audio_file.duration_seconds % 90 else 0))
+    output = ''
 
     # Get text in wav
     r = speech_recognition.Recognizer()
 
-    with speech_recognition.AudioFile(new_path) as file:
-        audio = r.record(file)
-        r.adjust_for_ambient_noise(file)
+    for i in range(count):
+        temp_audio = audio_file[90000 * i:90000 * (i + 1)]
+        temp_audio.export(new_path, format="wav")
+        with speech_recognition.AudioFile(new_path) as file:
+            audio = r.record(file)
+            r.adjust_for_ambient_noise(file)
+            test = r.recognize_google(audio, language="ru-RU")
+            output += test
+
+        os.remove(new_path)
 
     os.remove(path)
-    os.remove(new_path)
 
-    return r.recognize_google(audio, language="ru-RU")
+    return output
 
 
+@router.message(F.voice)
 @router.message(Command('text'))
 @router.message(Text('вася текст'))
-async def get_text_from_voice(message: Message, bot: Bot, main_def=True) -> None:
+async def get_text_from_voice(message: Message, bot: Bot) -> None:
     add_log('get_text_from_voice', message)
-    if main_def:
+    if not message.voice:
         if not message.reply_to_message:
             await message.answer('Перешлите сообщение с прикрепленным аудио.')
             return
@@ -52,23 +62,19 @@ async def get_text_from_voice(message: Message, bot: Bot, main_def=True) -> None
             return
 
     try:
-        if main_def:
-            file_id = message.reply_to_message.voice.file_id
-        else:
+        if message.voice:
             file_id = message.voice.file_id
+        else:
+            file_id = message.reply_to_message.voice.file_id
+
         file = await bot.get_file(file_id)
         file_path = file.file_path
         local_path = f'voices/{message.chat.id}{message.message_id}.mp3'
         await bot.download_file(file_path, local_path)
 
         temp_message = await message.reply('Ожидайте...')
-        text = voice_to_text(local_path)
+        text = await voice_to_text(local_path)
 
         await temp_message.edit_text(text)
     except TypeError or AttributeError:
         await message.answer('Произошла ошибка при обработке файла.')
-
-
-@router.message(F.voice)
-async def get_text_from_voice2(message: Message, bot: Bot) -> None:
-    await get_text_from_voice(message, bot, main_def=False)
