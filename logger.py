@@ -2,10 +2,10 @@ import logging
 from datetime import date
 from config import LOGFILE_NAME
 
-logname = date.today().strftime('%Y-%m-%d_') + LOGFILE_NAME
+logname = 'logs/' + date.today().strftime('%Y-%m-%d_') + LOGFILE_NAME
 
 logging.basicConfig(level=logging.INFO,
-                    filename=f'logs/{logname}',
+                    filename=f'{logname}',
                     filemode="a",
                     format="%(asctime)s %(levelname)s %(message)s")
 

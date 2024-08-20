@@ -87,6 +87,7 @@ async def get_text_from_voice(message: Message, bot: Bot) -> None:
         print(text)
         add_log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!__________1234qwlfkjqwsdpofjhwqurt90823u4t092erhjiowehjgwio', message, log_level=5)
 
-        await temp_message.edit_text(text)
+        await bot.delete_message(chat_id=temp_message.chat.id, message_id=temp_message.message_id)
+        await message.reply('Готово!')
     except TypeError or AttributeError:
         await message.answer('Произошла ошибка при обработке файла.')
