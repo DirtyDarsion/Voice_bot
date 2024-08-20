@@ -9,7 +9,7 @@ from routers import service, voice_to_text, mem, weather
 
 
 async def main_polling() -> None:
-    print(f'Path to log: {os.getcwd()}/{logname}')
+    print(f'Path to log: {os.getcwd()}/logs/{logname}')
     print('Start polling...')
 
     bot = Bot(token=TOKEN)

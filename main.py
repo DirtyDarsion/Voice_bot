@@ -24,7 +24,7 @@ async def on_startup(bot: Bot) -> None:
 
 
 def main() -> None:
-    print(f'Path to log: {os.getcwd()}/{logname}')
+    print(f'Path to log: {os.getcwd()}/logs/{logname}')
 
     dp = Dispatcher()
     dp.include_routers(
