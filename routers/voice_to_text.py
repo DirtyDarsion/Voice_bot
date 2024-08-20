@@ -84,6 +84,7 @@ async def get_text_from_voice(message: Message, bot: Bot) -> None:
 
         temp_message = await message.reply('Ожидайте...')
         text = voice_to_text(local_path)
+        print(text)
 
         await temp_message.edit_text(text)
     except TypeError or AttributeError:
