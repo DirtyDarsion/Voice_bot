@@ -6,6 +6,5 @@ routers/download_video.py
 test.*
 
 .idea/
-logs/*
 __pycache__/
 */__pycache__/
