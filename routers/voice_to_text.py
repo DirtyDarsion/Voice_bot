@@ -20,7 +20,7 @@ router = Router()
 '''
 
 
-def voice_to_text(path) -> str:
+async def voice_to_text(path) -> str:
     new_path = path[:-3] + 'wav'
 
     # Change format to wav
@@ -64,7 +64,7 @@ async def get_text_from_voice(message: Message, bot: Bot) -> None:
         await bot.download_file(file_path, local_path)
 
         temp_message = await message.reply('Ожидайте...')
-        text = voice_to_text(local_path)
+        text = await voice_to_text(local_path)
 
         await temp_message.edit_text(text)
     except TypeError or AttributeError:
