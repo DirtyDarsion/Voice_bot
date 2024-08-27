@@ -19,7 +19,7 @@ async def start(message: Message) -> None:
 @router.message(Command('log'), ItsMe())
 async def send_log(message: Message) -> None:
     add_log('get_log', message)
-    with open(f'logs/{logname}', 'r') as log:
+    with open(f'{logname}', 'r') as log:
         text = log.readlines()
         answer = text[-30:]
         message_text = ''.join(answer)
@@ -31,7 +31,7 @@ async def send_log(message: Message) -> None:
 @router.message(Command('logfile'), ItsMe())
 async def send_log(message: Message) -> None:
     add_log('get_logfile', message)
-    await message.reply_document(open(f'logs/{logname}', 'rb'))
+    await message.reply_document(open(f'{logname}', 'rb'))
 
 
 # Помощь
