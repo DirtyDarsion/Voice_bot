@@ -1,7 +1,6 @@
 import os
 import speech_recognition
 import soundfile
-# from pydub import AudioSegment
 
 from aiogram import Router, Bot, F
 from aiogram.types import Message

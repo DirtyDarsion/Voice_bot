@@ -11,6 +11,11 @@ class ItsMe(BaseFilter):
         return message.from_user.id == ADMIN
 
 
+class ItsUrl(BaseFilter):
+    async def __call__(self, message: Message) -> bool:
+        return message.text[:8] == 'https://'
+
+
 class Text(BaseFilter):
     def __init__(self, text: Union[str], ignore_case: Union[bool] = True):
         if text:

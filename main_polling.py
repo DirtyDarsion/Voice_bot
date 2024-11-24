@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher
 
 from config import TOKEN
 from logger import logname
-from routers import service, voice_to_text, mem, weather
+from routers import service, voice_to_text, mem, weather, download_video
 
 
 async def main_polling() -> None:
@@ -19,6 +19,7 @@ async def main_polling() -> None:
         voice_to_text.router,
         mem.router,
         weather.router,
+        download_video.router,
     )
 
     await bot.delete_webhook(drop_pending_updates=True)

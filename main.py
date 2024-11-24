@@ -9,7 +9,7 @@ from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_applicati
 
 from config import TOKEN, SECRET_WEBHOOK, URL_WEBHOOK
 from logger import logname
-from routers import service, voice_to_text, mem, weather
+from routers import service, voice_to_text, mem, weather, download_video
 
 WEB_SERVER_HOST = "127.0.0.1"
 WEB_SERVER_PORT = 8080
@@ -32,6 +32,7 @@ def main() -> None:
         voice_to_text.router,
         mem.router,
         weather.router,
+        download_video.router,
     )
 
     # Register startup hook to initialize webhook

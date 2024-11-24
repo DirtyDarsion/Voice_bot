@@ -12,7 +12,7 @@ router = Router()
 async def start(message: Message) -> None:
     add_log('start', message)
 
-    await message.answer('Напиши "Вася команды"')
+    await message.answer('Напиши /help')
 
 
 # Отослать админу последние 30 строчек кода
@@ -43,4 +43,5 @@ async def start(message) -> None:
     await message.answer('Команды бота:\n'
                          '- Вася текст или /text - перевести в текст прикрепленное аудио\n'
                          '- Вася мем или /mem - отправить голосовые отрывки из мемов\n'
-                         '- Вася погода или /weather - получить актуальные данные о погоде и валюте')
+                         '- Вася погода или /weather - получить актуальные данные о погоде и валюте\n'
+                         '- Ссылка или /video - скачать видео с Instagram')
