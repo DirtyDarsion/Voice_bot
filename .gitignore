@@ -2,7 +2,6 @@
 config.py
 logfile.log
 future.py
-routers/download_video.py
 test.*
 logs/*
 
