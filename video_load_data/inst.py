@@ -26,10 +26,15 @@ def download_iqsaved(user_download_url):
     elem.send_keys(user_download_url)
     elem.send_keys(Keys.ENTER)
 
-    while True:
+    for _ in range(60):
         if driver.find_elements(By.CLASS_NAME, 'results__actions'):
             break
         sleep(1)
+    else:
+        return {
+            'file': False,
+            'error': 'Превышено время ожидания для загрузки, попробуйте позже',
+        }
 
     result = driver.find_element(By.CLASS_NAME, 'results__item')
     button = result.find_element(By.TAG_NAME, 'a')

@@ -11,7 +11,6 @@ logging.basicConfig(level=logging.INFO,
 
 
 def add_log(def_name, message=None, log_level=2, info=''):
-    print()
     if message:
         user = f'{message.from_user.username}({message.from_user.id}) '
         if message.chat.type == 'group':

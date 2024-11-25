@@ -21,9 +21,9 @@ async def video_help(message):
 
 
 @router.message(ItsUrl())
-async def get_url(message, bot: Bot):
-    add_log('get_video_url')
+async def get_url(message):
     url = message.text.strip()
+    add_log('get_video_url', message)
 
     temp_message = await message.answer(f'Ожидайте...')
 
@@ -44,6 +44,8 @@ async def get_url(message, bot: Bot):
         await temp_message.delete()
         await message.answer_video(video)
         os.remove(file_path)
+    if 'error' in video_data:
+        await temp_message.edit_text(video_data['error'])
     else:
         await temp_message.edit_text(f'Вес файла превышает допустимый для загрузки(<b>{video_data['size']}</b>)',
                                      parse_mode='HTML')
