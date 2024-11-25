@@ -33,9 +33,10 @@ def download_iqsaved(user_download_url):
 
     result = driver.find_element(By.CLASS_NAME, 'results__item')
     button = result.find_element(By.TAG_NAME, 'a')
-    file_url, file_name = button.get_attribute('href'), button.get_attribute('download')
+    file_url = button.get_attribute('href')
+    file_name = button.get_attribute('download')
 
-    driver.close()
+    driver.quit()
 
     response = requests.get(file_url)
     file_size = response.headers['Content-Length']
