@@ -37,16 +37,20 @@ async def get_url(message):
             'error': 'Формат ссылки неизвестен, попробуйте другой'
         }
 
-    if video_data['file']:
+    print(video_data)
+
+    if video_data['status'] == 'ok':
         file_path = video_data['file']
         exp = file_path.split('.')[-1]
         video = FSInputFile(file_path, filename=f'vasya_video.{exp}')
         await temp_message.delete()
         await message.answer_video(video)
         os.remove(file_path)
-    if 'error' in video_data:
-        await temp_message.edit_text(video_data['error'])
-    else:
+    elif video_data['status'] == 'large_file':
         await temp_message.edit_text(f'Вес файла превышает допустимый для загрузки(<b>{video_data['size']}</b>)',
                                      parse_mode='HTML')
         # но его можно скачать по ссылке:\n{video_data['link']}
+    elif video_data['status'] == 'error':
+        await temp_message.edit_text(video_data['error_text'])
+    else:
+        await temp_message.edit_text('Непредвиденная ошибка')

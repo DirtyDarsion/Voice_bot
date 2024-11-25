@@ -16,7 +16,7 @@ def download_iqsaved(user_download_url):
     url = 'https://iqsaved.com/ru/'
 
     options = webdriver.ChromeOptions()
-    options.add_argument('headless')
+    # options.add_argument('headless')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--no-sandbox')
     driver = webdriver.Chrome(options=options)
@@ -26,15 +26,25 @@ def download_iqsaved(user_download_url):
     elem.send_keys(user_download_url)
     elem.send_keys(Keys.ENTER)
 
-    for _ in range(60):
+    for i in range(61):
+        if i == 60:
+            return {
+                'status': 'error',
+                'error_text': 'Превышено время ожидания для загрузки, попробуйте позже',
+            }
+
         if driver.find_elements(By.CLASS_NAME, 'results__actions'):
             break
+        elif driver.find_elements(By.CLASS_NAME, 'results__error'):
+            # sleep(50)
+            # error_block = driver.find_element(By.CLASS_NAME, 'results__error')
+            # print(error_block)
+            return {
+                'status': 'error',
+                'error_text': 'Ошибка 131',
+            }
+
         sleep(1)
-    else:
-        return {
-            'file': False,
-            'error': 'Превышено время ожидания для загрузки, попробуйте позже',
-        }
 
     result = driver.find_element(By.CLASS_NAME, 'results__item')
     button = result.find_element(By.TAG_NAME, 'a')
@@ -50,11 +60,12 @@ def download_iqsaved(user_download_url):
         with open('video_load_data/' + file_name, 'wb') as file:
             file.write(response.content)
         return {
+            'status': 'ok',
             'file': 'video_load_data/' + file_name,
         }
     else:
         return {
-            'file': False,
+            'status': 'large_file',
             'link': file_url,
             'size': naturalsize(file_size),
         }
