@@ -28,7 +28,9 @@ async def get_url(message):
     temp_message = await message.answer(f'Ожидайте...')
 
     if re.search(r'^https://.*(instagram|ig).com', url):
-        video_data = download_iqsaved(url)
+        await temp_message.edit_text('В данные момент загрузка с YouTube не работает.')
+        return
+    # video_data = download_iqsaved(url)
     elif re.search(r'^https://.*(youtube).com', url):
         await temp_message.edit_text('В данные момент загрузка с YouTube не работает.')
         return
