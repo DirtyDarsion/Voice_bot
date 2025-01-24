@@ -1,12 +1,12 @@
 import os
 import re
 
-from aiogram import Router, Bot
+from aiogram import Router
 from aiogram.filters.command import Command
 from aiogram.types import FSInputFile
 
 from video_load_data.inst import download_iqsaved
-from video_load_data.youtube import download_savefrom
+# from video_load_data.youtube import download_savefrom
 from filters import ItsUrl
 from logger import add_log
 
@@ -29,7 +29,9 @@ async def get_url(message):
 
     if re.search(r'^https://.*(instagram|ig).com', url):
         video_data = download_iqsaved(url)
-    # elif re.search(r'^https://.*(youtube).com', url):
+    elif re.search(r'^https://.*(youtube).com', url):
+        await temp_message.edit_text('В данные момент загрузка с YouTube не работает.')
+        return
     #     video_data = download_savefrom(url)
     else:
         video_data = {
